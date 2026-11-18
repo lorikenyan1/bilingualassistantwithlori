@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilingual Assistant With Lori</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #0d9488;
+            --gold: #d97706;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 0.75rem; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Splash Screen Overlay */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #020617; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        #splash-screen img { max-width: 220px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 1rem; }
+        #splash-screen h2 { color: #f8fafc; font-size: 1.25rem; font-weight: 600; }
+
+        header { text-align: center; margin-bottom: 0.75rem; padding-top: 0.25rem; }
+        header h1 { font-size: 1.2rem; color: #60a5fa; font-weight: 700; }
+        header p { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+        /* 13-Screen Navigation Tabs */
+        .nav-tabs { display: flex; gap: 0.35rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 0.75rem; scrollbar-width: none; }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { background: var(--border); border: none; padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; white-space: nowrap; color: var(--text-muted); }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .container { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .screen { display: none; }
+        .screen.active { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; color: #cbd5e1; }
+        select, textarea, input, button { width: 100%; font-size: 0.9rem; padding: 0.6rem; background: #0f172a; color: white; border: 1px solid var(--border); border-radius: 8px; outline: none; }
+        select:focus, textarea:focus { border-color: var(--primary); }
+        textarea { resize: vertical; min-height: 70px; }
+
+        .btn { background-color: var(--primary); color: white; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .btn:hover { background-color: var(--primary-dark); }
+        .btn-accent { background-color: var(--accent); }
+        .btn-gold { background-color: var(--gold); }
+
+        .output-box { background: #0f172a; border-radius: 8px; padding: 0.75rem; min-height: 60px; font-size: 0.9rem; border: 1px dashed var(--border); color: #e2e8f0; }
+        .badge { display: inline-block; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.4rem; }
+        
+        footer { text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem; padding-bottom: 0.5rem; }
+        footer a { color: #60a5fa; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="splash_logo.png" alt="Bilingual Assistant With Lori">
+        <h2>Bilingual Assistant With Lori</h2>
+    </div>
+
+    <header>
+        <h1>Bilingual Assistant With Lori</h1>
+        <p>English • Español • 中文 | 13-Screen Suite</p>
+    </header>
+
+    <!-- 13-Screen Navigation Bar -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchScreen('home')">1. Home</button>
+        <button class="tab-btn" onclick="switchScreen('translator')">2. Translator</button>
+        <button class="tab-btn" onclick="switchScreen('tutor')">3. AI Tutor</button>
+        <button class="tab-btn" onclick="switchScreen('sprints')">4. Sprints</button>
+        <button class="tab-btn" onclick="switchScreen('scenarios')">5. Scenarios</button>
+        <button class="tab-btn" onclick="switchScreen('vocabulary')">6. Vocabulary</button>
+        <button class="tab-btn" onclick="switchScreen('grammar')">7. Grammar</button>
+        <button class="tab-btn" onclick="switchScreen('pronunciation')">8. Pronounce</button>
+        <button class="tab-btn" onclick="switchScreen('culture')">9. Culture</button>
+        <button class="tab-btn" onclick="switchScreen('progress')">10. Progress</button>
+        <button class="tab-btn" onclick="switchScreen('settings')">11. Settings</button>
+        <button class="tab-btn" onclick="switchScreen('support')">12. Support</button>
+        <button class="tab-btn" onclick="switchScreen('subscription')">⭐ Pro ($1.99)</button>
+    </div>
+
+    <div class="container">
+        
+        <!-- SCREEN 1: HOME DASHBOARD -->
+        <div id="screen-home" class="screen active">
+            <div class="card">
+                <span class="badge">Welcome Back, Lori</span>
+                <h2 style="font-size: 1.1rem; margin-bottom: 0.4rem;">Daily Learning Streak</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">🔥 5-Day Streak Active! Keep up your multilingual progress.</p>
+                <button class="btn" onclick="switchScreen('translator')">Open AI Translator</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: AI TRANSLATOR -->
+        <div id="screen-translator" class="screen">
+            <div class="card">
+                <span class="badge">Screen 2: Translator</span>
+                <label for="sourceText">Text to Translate</label>
+                <textarea id="sourceText" placeholder="Type what you want to translate..."></textarea>
+                
+                <label for="targetLang">Target Language</label>
+                <select id="targetLang" style="margin-bottom: 0.75rem;">
+                    <option value="es">Spanish (Español)</option>
+                    <option value="zh">Simplified Chinese (中文)</option>
+                    <option value="en">English</option>
+                </select>
+                
+                <button class="btn" onclick="handleTranslate()">Translate Text</button>
+            </div>
+            <div class="card">
+                <label>Result & Audio Output</label>
+                <div id="translationOutput" class="output-box">Your translation will appear here...</div>
+                <button class="btn btn-accent" onclick="speakResult()" style="margin-top: 0.5rem;">🔊 Play Audio (TTS Bridge)</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: LORI AI TUTOR -->
+        <div id="screen-tutor" class="screen">
+            <div class="card">
+                <span class="badge">Screen 3: AI Companion</span>
+                <label for="tutorPersona">Select Lori's Persona</label>
+                <select id="tutorPersona" style="margin-bottom: 0.75rem;">
+                    <option value="friendly">Friendly Conversational Partner</option>
+                    <option value="strict">Strict Grammar & Pronunciation Coach</option>
+                </select>
+                <textarea id="tutorInput" placeholder="Ask Lori a question..."></textarea>
+                <button class="btn btn-accent" onclick="handleAITutor()">Ask Lori</button>
+            </div>
+            <div class="card">
+                <label>Lori's Response</label>
+                <div id="tutorOutput" class="output-box">Hello! How can I help you practice today?</div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: MICRO-SPRINTS -->
+        <div id="screen-sprints" class="screen">
+            <div class="card">
+                <span class="badge">Screen 4: Micro-Sprints</span>
+                <div style="background: #0f172a; padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 0.75rem;">
+                    <strong style="font-size: 1rem;" id="sprintWord">"Where is the nearest station?"</strong>
+                </div>
+                <button class="btn btn-gold" onclick="nextSprintWord()">Next Sprint Word</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: REAL-WORLD SCENARIOS -->
+        <div id="screen-scenarios" class="screen">
+            <div class="card">
+                <span class="badge">Screen 5: Scenarios</span>
+                <button class="btn" style="margin-bottom: 0.5rem;" onclick="loadScenario('Restaurant Ordering')">🍽️ Restaurant Ordering</button>
+                <button class="btn" onclick="loadScenario('Travel & Navigation')">✈️ Travel & Navigation</button>
+            </div>
+            <div class="card">
+                <label>Scenario Output</label>
+                <div id="scenarioOutput" class="output-box">Select a scenario above to begin practicing.</div>
+            </div>
+        </div>
+
+        <!-- SCREENS 6 TO 12: PLACEHOLDER MODULES -->
+        <div id="screen-vocabulary" class="screen"><div class="card"><span class="badge">Screen 6: Vocabulary Vault</span><p style="font-size: 0.85rem; color: var(--text-muted);">Save and review your starred translated phrases here.</p></div></div>
+        <div id="screen-grammar" class="screen"><div class="card"><span class="badge">Screen 7: Grammar Rules</span><p style="font-size: 0.85rem; color: var(--text-muted);">Quick-reference verb conjugation tables across English, Spanish, and Chinese.</p></div></div>
+        <div id="screen-pronunciation" class="screen"><div class="card"><span class="badge">Screen 8: Pronunciation Lab</span><p style="font-size: 0.85rem; color: var(--text-muted);">Phonetic breakdowns and tone matching modules.</p></div></div>
+        <div id="screen-culture" class="screen"><div class="card"><span class="badge">Screen 9: Cultural Context</span><p style="font-size: 0.85rem; color: var(--text-muted);">Idioms, local nuances, and regional dialect tips.</p></div></div>
+        <div id="screen-progress" class="screen"><div class="card"><span class="badge">Screen 10: Progress Analytics</span><p style="font-size: 0.85rem; color: var(--text-muted);">Visual charts tracking words learned and daily study time.</p></div></div>
+        <div id="screen-settings" class="screen"><div class="card"><span class="badge">Screen 11: App Settings</span><p style="font-size: 0.85rem; color: var(--text-muted);">Manage audio speed, voice pitch, and theme preferences.</p></div></div>
+        <div id="screen-support" class="screen"><div class="card"><span class="badge">Screen 12: Support & FAQ</span><p style="font-size: 0.85rem; color: var(--text-muted);">Contact developer support or read user guides.</p></div></div>
+
+        <!-- SCREEN 13: SUBSCRIPTION TIER -->
+        <div id="screen-subscription" class="screen">
+            <div class="card" style="border: 2px solid var(--gold);">
+                <span class="badge" style="background: rgba(217, 119, 6, 0.2); color: #f59e0b;">Screen 13: Pro Access</span>
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem;">Unlock All 13 Screens</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">Upgrade to **Bilingual Assistant Pro** for **$1.99/month** via RevenueCat.</p>
+                <button class="btn btn-gold" onclick="alert('Initiating RevenueCat checkout ($1.99/mo)...')">Upgrade Now ($1.99/mo)</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Bilingual Assistant With Lori. <a href="privacy.html">Privacy</a> | <a href="terms.html">Terms</a></p>
+    </footer>
+
+    <script>
+        // Hide splash screen after 1.5 seconds
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 500);
+            }, 1500);
+        });
+
+        let lastTranslatedText = "";
+
+        function switchScreen(name) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`screen-${name}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function handleTranslate() {
+            const text = document.getElementById('sourceText').value.trim();
+            const lang = document.getElementById('targetLang').value;
+            const outputBox = document.getElementById('translationOutput');
+            if (!text) {
+                outputBox.innerText = "Please enter some text first.";
+                return;
+            }
+            outputBox.innerText = "Translating...";
+            setTimeout(() => {
+                lastTranslatedText = `[${lang.toUpperCase()}] Translated: ${text}`;
+                outputBox.innerText = lastTranslatedText;
+                speakResult();
+            }, 300);
+        }
+
+        function handleAITutor() {
+            const prompt = document.getElementById('tutorInput').value.trim();
+            const persona = document.getElementById('tutorPersona').value;
+            const output = document.getElementById('tutorOutput');
+            if (!prompt) {
+                output.innerText = "Please ask Lori a question.";
+                return;
+            }
+            output.innerText = "Lori is thinking...";
+            setTimeout(() => {
+                output.innerText = `[Lori - ${persona.toUpperCase()}]: Great practice prompt! Let's work on phrasing that together.`;
+            }, 400);
+        }
+
+        const sprintWords = ["\"Where is the nearest station?\"", "\"I would like a glass of water, please.\""];
+        let sprintIdx = 0;
+        function nextSprintWord() {
+            sprintIdx = (sprintIdx + 1) % sprintWords.length;
+            document.getElementById('sprintWord').innerText = sprintWords[sprintIdx];
+        }
+
+        function loadScenario(title) {
+            document.getElementById('scenarioOutput').innerText = `Active Scenario: ${title}. Practice speaking your response aloud!`;
+        }
+
+        function speakResult() {
+            const textToSpeak = lastTranslatedText || document.getElementById('translationOutput').innerText;
+            const lang = document.getElementById('targetLang').value;
+            if (window.AndroidTTS && typeof window.AndroidTTS.speak === "function") {
+                window.AndroidTTS.speak(textToSpeak, lang);
+            } else if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = lang === 'es' ? 'es-ES' : lang === 'zh' ? 'zh-CN' : 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>
